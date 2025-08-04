@@ -35,8 +35,8 @@
   },
   "name":"robot_apf_dwa_gml",
   "resources":[
-    {"id":{"name":"map_control","path":"objects/map_control/map_control.yy",},},
     {"id":{"name":"obj_goal","path":"objects/obj_goal/obj_goal.yy",},},
+    {"id":{"name":"obj_map_control","path":"objects/obj_map_control/obj_map_control.yy",},},
     {"id":{"name":"obj_obstaculo","path":"objects/obj_obstaculo/obj_obstaculo.yy",},},
     {"id":{"name":"obj_rob","path":"objects/obj_rob/obj_rob.yy",},},
     {"id":{"name":"map","path":"rooms/map/map.yy",},},

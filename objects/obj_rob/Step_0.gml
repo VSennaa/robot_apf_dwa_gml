@@ -1,6 +1,3 @@
-// In the Step event of the object
-x = clamp(x, 0, room_width - sprite_width); // Adjust for sprite size
-y = clamp(y, 0, room_height - sprite_height); // Adjust for sprite size
 
 // --- Lógica de Estado e Movimento ---
 
@@ -8,7 +5,6 @@ y = clamp(y, 0, room_height - sprite_height); // Adjust for sprite size
 if (!instance_exists(obj_goal) or estado == ESTADO_ROBO.ALCANCADO) {
     linear_velocity = 0;
     angular_velocity = 0;
-	game_restart();
     exit;
 }
 
@@ -17,22 +13,23 @@ if (point_distance(x, y, obj_goal.x, obj_goal.y) < 24) {
     estado = ESTADO_ROBO.ALCANCADO;
     linear_velocity = 0;
     angular_velocity = 0;
-	room_restart()
+	game_restart();
     exit;
 }
 
-// --- RECUPERAÇÃO ---
-if (abs(linear_velocity) < 5 && estado != ESTADO_ROBO.ALCANCADO && estado != ESTADO_ROBO.RECUPERANDO) {
-    stuck_timer += delta_time / 1000000; 
+// --- LÓGICA DE DETECÇÃO DE "PRESO" E RECUPERAÇÃO ---
+if (abs(linear_velocity) < 2 && estado != ESTADO_ROBO.ALCANCADO && estado != ESTADO_ROBO.RECUPERANDO) {
+    stuck_timer += delta_time / 1000000; // Adiciona segundos
 } else {
     stuck_timer = 0;
 }
 
-if (stuck_timer > 2) {
+// Se ficou preso por mais de 5 segundos, inicia a recuperação
+if (stuck_timer > 5) {
     stuck_timer = 0;
     estado = ESTADO_ROBO.RECUPERANDO;
-    recovery_timer = 1.0; 
-    recovery_turn_direction = choose(1, -1);
+    recovery_timer = 1.0; // Duração da manobra de recuperação
+    recovery_turn_direction = choose(1, -1); // Escolhe uma direção de giro aleatória
 }
 
 
@@ -61,7 +58,8 @@ switch (estado) {
 }
 
 
-// --- APLICAÇÃO DO MOVIMENTO E COLISÃO FÍSICA (SEMPRE EXECUTA) ---
+// --- APLICAÇÃO DO MOVIMENTO E COLISÃO FÍSICA ---
+// (A lógica de colisão física com place_meeting continua importante como última camada de segurança)
 var _dt_sec = delta_time / 1000000;
 var _move_x = linear_velocity * dcos(direction) * _dt_sec;
 var _move_y = -linear_velocity * dsin(direction) * _dt_sec;

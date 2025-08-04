@@ -6,16 +6,16 @@ y = 32;
 enum ESTADO_ROBO {
     BUSCANDO,
     CONTORNANDO,
-    RECUPERANDO, 
-    PRESO,      
+    RECUPERANDO,
+    PRESO,
     ALCANCADO
 }
 estado = ESTADO_ROBO.BUSCANDO;
 
-// --- TIMERS E CONTROLES DE RECUPERAÇÃO (NOVO) ---
+// --- TIMERS E CONTROLES DE RECUPERAÇÃO ---
 stuck_timer = 0;
 recovery_timer = 0;
-recovery_turn_direction = 1; // 1 para direita, -1 para esquerda
+recovery_turn_direction = 1;
 
 // --- ATRIBUTOS DE MOVIMENTO (MODELO FÍSICO) ---
 linear_velocity = 0;
@@ -24,7 +24,7 @@ angular_velocity = 0;
 // Parâmetros do robô físico
 ROBOT_RADIUS = 12;
 WHEEL_BASE = 28; 
-MAX_SPEED = 60;
+MAX_SPEED = 120;
 MAX_TURN_RATE = pi;
 MAX_LINEAR_ACCEL = 40;
 MAX_ANGULAR_ACCEL = pi * 1.5;
@@ -50,34 +50,60 @@ WALL_FOLLOW_DISTANCE = 32;
 WALL_FOLLOW_GAIN = 0.1;
 
 #region // --- Métodos de Navegação ---
+
+//--------------------------------------------------------------------------------
+// MÉTODO: SENSE (ATUALIZADO PARA DETECTAR BORDAS DA SALA)
+//--------------------------------------------------------------------------------
 sense_environment = function() {
     for (var i = 0; i < array_length(angulos_sensores); i++) {
         var _sensor_angle_deg = direction + angulos_sensores[i];
         var _hit_dist = distancia_sensor;
+        
         var _step = 4;
         for (var d = 0; d < distancia_sensor; d += _step) {
             var _check_x = x + lengthdir_x(d, _sensor_angle_deg);
             var _check_y = y + lengthdir_y(d, _sensor_angle_deg);
-            if (position_meeting(_check_x, _check_y, obj_obstaculo)) {
+            
+            // VERIFICAÇÃO DE COLISÃO COM OBSTÁCULOS FÍSICOS OU BORDAS DA SALA
+            if (position_meeting(_check_x, _check_y, obj_obstaculo) || 
+                _check_x <= ROBOT_RADIUS || _check_x >= room_width - ROBOT_RADIUS ||
+                _check_y <= ROBOT_RADIUS || _check_y >= room_height - ROBOT_RADIUS)
+            {
                 _hit_dist = d;
                 break;
             }
         }
+        
         var _end_x = x + lengthdir_x(_hit_dist, _sensor_angle_deg);
         var _end_y = y + lengthdir_y(_hit_dist, _sensor_angle_deg);
+        
         leituras_sensores[i] = [_hit_dist, _end_x, _end_y];
     }
 }
 
+
+// (O restante das funções de método permanece o mesmo)
 dynamic_window_approach = function() {
+    // LÓGICA PARA SAIR DO MODO DE CONTORNO
     if (estado == ESTADO_ROBO.CONTORNANDO) {
         var _angle_to_goal = point_direction(x, y, obj_goal.x, obj_goal.y);
         var _angle_diff = abs(angle_difference(direction, _angle_to_goal));
         var _front_sensor_dist = leituras_sensores[0][0];
-        if (_angle_diff < 45 && _front_sensor_dist >= distancia_sensor * 0.8) {
+        
+        // Pega a leitura do sensor esquerdo (-90 graus, índice 5)
+        var _left_sensor_dist = leituras_sensores[5][0];
+
+        // Condição 1: O caminho para o objetivo está livre
+        var _can_see_goal = (_angle_diff < 45 && _front_sensor_dist >= distancia_sensor * 0.8);
+        // Condição 2: A parede à esquerda "acabou" (sensor não detecta nada perto)
+        var _wall_ended = (_left_sensor_dist >= distancia_sensor);
+
+        // Se qualquer uma das condições for verdadeira, volta a buscar
+        if (_can_see_goal || _wall_ended) {
             estado = ESTADO_ROBO.BUSCANDO;
         }
     }
+    
     var _dt_sec = delta_time / 1000000;
     var _v_min = max(0, linear_velocity - MAX_LINEAR_ACCEL * _dt_sec);
     var _v_max = min(MAX_SPEED, linear_velocity + MAX_LINEAR_ACCEL * _dt_sec);
