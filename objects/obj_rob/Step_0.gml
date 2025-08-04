@@ -13,19 +13,18 @@ if (point_distance(x, y, obj_goal.x, obj_goal.y) < 24) {
     estado = ESTADO_ROBO.ALCANCADO;
     linear_velocity = 0;
     angular_velocity = 0;
+	global.success_count ++
 	game_restart();
     exit;
 }
 
-// --- LÓGICA DE DETECÇÃO DE "PRESO" E RECUPERAÇÃO ---
-if (abs(linear_velocity) < 2 && estado != ESTADO_ROBO.ALCANCADO && estado != ESTADO_ROBO.RECUPERANDO) {
+// RECUPERAÇÃO ---
+if (abs(linear_velocity) < 5 && estado != ESTADO_ROBO.ALCANCADO && estado != ESTADO_ROBO.RECUPERANDO) {
     stuck_timer += delta_time / 1000000; // Adiciona segundos
 } else {
     stuck_timer = 0;
 }
-
-// Se ficou preso por mais de 5 segundos, inicia a recuperação
-if (stuck_timer > 5) {
+if (stuck_timer > 2) {
     stuck_timer = 0;
     estado = ESTADO_ROBO.RECUPERANDO;
     recovery_timer = 1.0; // Duração da manobra de recuperação
@@ -82,3 +81,10 @@ x += _move_x;
 y += _move_y;
 
 direction += radtodeg(angular_velocity) * _dt_sec;
+
+if obj_rob.x > room_width or obj_rob.x < 0{
+	game_restart();
+}
+if obj_rob.y > room_height or obj_rob.y < 0{
+	game_restart();
+}

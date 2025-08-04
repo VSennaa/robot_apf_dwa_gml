@@ -52,7 +52,8 @@ WALL_FOLLOW_GAIN = 0.1;
 #region // --- Métodos de Navegação ---
 
 //--------------------------------------------------------------------------------
-// MÉTODO: SENSE (ATUALIZADO PARA DETECTAR BORDAS DA SALA)
+// BORDAS ( Não entendo mt bem mas funciona, mas basicamente cria o sensor e 
+//			guarda as informações de distancia e posição em leituras_sensores)
 //--------------------------------------------------------------------------------
 sense_environment = function() {
     for (var i = 0; i < array_length(angulos_sensores); i++) {
@@ -82,15 +83,16 @@ sense_environment = function() {
 }
 
 
-// (O restante das funções de método permanece o mesmo)
-dynamic_window_approach = function() {
-    // LÓGICA PARA SAIR DO MODO DE CONTORNO
-    if (estado == ESTADO_ROBO.CONTORNANDO) {
+
+dynamic_window_approach = function() { // o objetivo é determinar a melhor velocidade linear (v) e angular (w)
+    
+    if (estado == ESTADO_ROBO.CONTORNANDO) {// LÓGICA PARA SAIR DO MODO DE CONTORNO, 
+											// sem isso ele vai emborakkkkkk e vira um método meio aleatório
         var _angle_to_goal = point_direction(x, y, obj_goal.x, obj_goal.y);
         var _angle_diff = abs(angle_difference(direction, _angle_to_goal));
         var _front_sensor_dist = leituras_sensores[0][0];
         
-        // Pega a leitura do sensor esquerdo (-90 graus, índice 5)
+        // Pega a leitura do sensor esquerdo 
         var _left_sensor_dist = leituras_sensores[5][0];
 
         // Condição 1: O caminho para o objetivo está livre
@@ -104,7 +106,9 @@ dynamic_window_approach = function() {
         }
     }
     
-    var _dt_sec = delta_time / 1000000;
+	
+	// Essa parte é bem complicada, mas em suma busca o melhor v e w possível que máximiza o score
+    var _dt_sec = delta_time / 1000000; //normalização de tempo 
     var _v_min = max(0, linear_velocity - MAX_LINEAR_ACCEL * _dt_sec);
     var _v_max = min(MAX_SPEED, linear_velocity + MAX_LINEAR_ACCEL * _dt_sec);
     var _w_min = max(-MAX_TURN_RATE, angular_velocity - MAX_ANGULAR_ACCEL * _dt_sec);
