@@ -3,6 +3,15 @@
 x = 32;
 y = 32;
 
+//dados pra depuraçao e pro relatorio
+log_data = ds_list_create();
+distance_traveled = 0;
+last_x = x;
+last_y = y;
+time_stuck = 0;
+missions_completed = 0;
+missions_failed = 0;
+
 enum ESTADO_ROBO {
     BUSCANDO,
     CONTORNANDO,
@@ -11,6 +20,7 @@ enum ESTADO_ROBO {
     ALCANCADO
 }
 estado = ESTADO_ROBO.BUSCANDO;
+show_vector_field = false;
 
 // --- TIMERS E CONTROLES DE RECUPERAÇÃO ---
 stuck_timer = 0;

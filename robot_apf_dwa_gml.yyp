@@ -40,6 +40,7 @@
     {"id":{"name":"obj_obstaculo","path":"objects/obj_obstaculo/obj_obstaculo.yy",},},
     {"id":{"name":"obj_rob","path":"objects/obj_rob/obj_rob.yy",},},
     {"id":{"name":"map","path":"rooms/map/map.yy",},},
+    {"id":{"name":"my_draw_arrow","path":"scripts/my_draw_arrow/my_draw_arrow.yy",},},
     {"id":{"name":"spr_goal","path":"sprites/spr_goal/spr_goal.yy",},},
     {"id":{"name":"spr_obstaculo","path":"sprites/spr_obstaculo/spr_obstaculo.yy",},},
     {"id":{"name":"spr_rob","path":"sprites/spr_rob/spr_rob.yy",},},

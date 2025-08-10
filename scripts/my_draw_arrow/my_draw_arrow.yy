@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"my_draw_arrow",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"my_draw_arrow",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

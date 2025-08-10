@@ -88,3 +88,24 @@ if obj_rob.x > room_width or obj_rob.x < 0{
 if obj_rob.y > room_height or obj_rob.y < 0{
 	game_restart();
 }
+
+if (keyboard_check_pressed(ord("F"))) {
+    show_vector_field = !show_vector_field; // alterna
+}
+
+// Distância acumulada
+distance_traveled += point_distance(last_x, last_y, x, y);
+last_x = x;
+last_y = y;
+
+// Log por frame
+var entry = {
+    time: current_time,
+    pos_x: x,
+    pos_y: y,
+    linear_velocity: linear_velocity,
+    angular_velocity: angular_velocity,
+    distance: distance_traveled
+};
+ds_list_add(log_data, entry);
+
